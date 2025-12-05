@@ -2,6 +2,7 @@ import pickle
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Фиксированные признаки
 FEATURES = ['year', 'km_driven', 'mileage', 'engine', 'max_power']
@@ -113,9 +114,9 @@ with tab3:
     except Exception as e:
         st.write(f"Невозможно отобразить веса модели: {e}")
     
-    # 2. EDA графики если есть данные
+    # 2. Ключевые графики EDA если есть данные
     if df_global is not None:
-        st.subheader("Анализ данных")
+        st.subheader("Ключевые графики EDA")
         
         df_for_eda = df_global.copy()
         df_for_eda = df_for_eda[[col for col in FEATURES if col in df_for_eda.columns]]
@@ -128,23 +129,98 @@ with tab3:
         df_for_eda = df_for_eda.dropna()
         
         if len(df_for_eda) > 0:
-            # Выбор признака для гистограммы
+            # Основные статистики
+            st.write("### Основные статистики:")
+            st.dataframe(df_for_eda.describe())
+            
+            # Гистограммы распределения для всех числовых признаков
+            st.write("### Распределение числовых признаков")
             numeric_cols = [c for c in df_for_eda.columns if pd.api.types.is_numeric_dtype(df_for_eda[c])]
             
             if numeric_cols:
-                col = st.selectbox("Выберите признак для гистограммы", numeric_cols)
+                # Определяем количество строк и колонок для сетки графиков
+                n_cols = 2
+                n_rows = (len(numeric_cols) + 1) // n_cols
                 
-                if col:
-                    fig, ax = plt.subplots(figsize=(10, 4))
-                    ax.hist(df_for_eda[col].dropna(), bins=30, edgecolor='black', alpha=0.7)
-                    ax.set_xlabel(col)
-                    ax.set_ylabel("Частота")
-                    ax.set_title(f"Распределение признака: {col}")
-                    st.pyplot(fig)
+                fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 5*n_rows))
+                axes = axes.flatten()
                 
-                # Основные статистики
-                st.write("Основные статистики:")
-                st.dataframe(df_for_eda.describe())
+                for idx, col in enumerate(numeric_cols):
+                    if idx < len(axes):
+                        axes[idx].hist(df_for_eda[col].dropna(), bins=30, edgecolor='black', alpha=0.7)
+                        axes[idx].set_xlabel(col)
+                        axes[idx].set_ylabel("Частота")
+                        axes[idx].set_title(f"Распределение: {col}")
+                
+                # Скрываем пустые subplot
+                for idx in range(len(numeric_cols), len(axes)):
+                    fig.delaxes(axes[idx])
+                
+                plt.tight_layout()
+                st.pyplot(fig)
+                
+                # Матрица корреляций
+                st.write("### Матрица корреляций")
+                corr_matrix = df_for_eda.corr()
+                
+                fig, ax = plt.subplots(figsize=(10, 8))
+                sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", 
+                           center=0, square=True, ax=ax)
+                ax.set_title("Матрица корреляций между признаками")
+                st.pyplot(fig)
+                
+                # Box plot для выявления выбросов
+                st.write("### Box plot для выявления выбросов")
+                fig, axes = plt.subplots(1, len(numeric_cols), figsize=(20, 6))
+                
+                if len(numeric_cols) == 1:
+                    axes = [axes]
+                
+                for idx, col in enumerate(numeric_cols):
+                    if idx < len(axes):
+                        axes[idx].boxplot(df_for_eda[col].dropna())
+                        axes[idx].set_title(f"Box plot: {col}")
+                        axes[idx].set_ylabel(col)
+                
+                plt.tight_layout()
+                st.pyplot(fig)
+                
+                # Диаграмма рассеяния для пар признаков
+                if len(numeric_cols) >= 2:
+                    st.write("### Диаграммы рассеяния")
+                    
+                    # Выбираем несколько комбинаций признаков
+                    pairs_to_plot = []
+                    for i in range(len(numeric_cols)):
+                        for j in range(i+1, len(numeric_cols)):
+                            if len(pairs_to_plot) < 4:  # Ограничиваем 4 графиками
+                                pairs_to_plot.append((numeric_cols[i], numeric_cols[j]))
+                    
+                    n_pairs = len(pairs_to_plot)
+                    if n_pairs > 0:
+                        n_cols_scatter = 2
+                        n_rows_scatter = (n_pairs + 1) // n_cols_scatter
+                        
+                        fig, axes = plt.subplots(n_rows_scatter, n_cols_scatter, figsize=(15, 5*n_rows_scatter))
+                        
+                        if n_pairs == 1:
+                            axes = [axes]
+                        else:
+                            axes = axes.flatten()
+                        
+                        for idx, (x_col, y_col) in enumerate(pairs_to_plot):
+                            if idx < len(axes):
+                                axes[idx].scatter(df_for_eda[x_col], df_for_eda[y_col], alpha=0.5)
+                                axes[idx].set_xlabel(x_col)
+                                axes[idx].set_ylabel(y_col)
+                                axes[idx].set_title(f"{x_col} vs {y_col}")
+                        
+                        # Скрываем пустые subplot
+                        for idx in range(n_pairs, len(axes)):
+                            fig.delaxes(axes[idx])
+                        
+                        plt.tight_layout()
+                        st.pyplot(fig)
             else:
                 st.write("Нет числовых признаков для анализа")
         else:
