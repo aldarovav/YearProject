@@ -31,7 +31,7 @@ st.title("Предсказание модели")
 df_global = None
 
 # Вкладки для разных режимов
-tab1, tab2, tab3 = st.tabs(["📁 Загрузить файл", "⌨️ Ручной ввод", "📊 Визуализации"])
+tab1, tab2, tab3 = st.tabs(["Загрузить файл", "Ручной ввод", "Визуализации"])
 
 # Вкладка 1: Загрузка файла
 with tab1:
@@ -77,7 +77,7 @@ with tab2:
         
         try:
             prediction = model.predict(input_data)[0]
-            st.success(f"Результат: {prediction}")
+            st.success(f"Результат: {prediction:.2f}")
             
             if hasattr(model, 'predict_proba'):
                 proba = model.predict_proba(input_data)[0]
