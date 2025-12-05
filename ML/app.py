@@ -159,14 +159,17 @@ with tab3:
                 plt.tight_layout()
                 st.pyplot(fig)
                 
-                # Матрица корреляций
-                st.write("### Матрица корреляций")
+                # Матрица корреляций (без автокорреляций)
+                st.write("### Корреляции между признаками")
                 corr_matrix = df_for_eda.corr()
-                
+
+                # Создаем маску для скрытия диагонали (автокорреляций)
+                mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
+
                 fig, ax = plt.subplots(figsize=(10, 8))
-                sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", 
-                           center=0, square=True, ax=ax)
-                ax.set_title("Матрица корреляций между признаками")
+                sns.heatmap(corr_matrix, mask=mask, annot=True, fmt=".2f", cmap="coolwarm", 
+                        center=0, square=True, ax=ax, linewidths=1)
+                ax.set_title("Корреляции между признаками (без автокорреляций)")
                 st.pyplot(fig)
                 
                 # Box plot для выявления выбросов
