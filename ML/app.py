@@ -8,7 +8,7 @@ FEATURES = ['year', 'km_driven', 'mileage', 'engine', 'max_power']
 
 @st.cache_resource
 def load_model():
-    with open('models/churn_model.pkl', 'rb') as f:
+    with open('ML/models/churn_model.pkl', 'rb') as f:
         return pickle.load(f)
 
 def clear(a):
