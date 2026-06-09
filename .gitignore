@@ -1,0 +1,18 @@
+*.pkl5/
+
+# Binary and cache files
+*.gif
+*.mp4
+*.avi
+*.pyc
+*.pyo
+*.db
+*.sqlite
+__pycache__/
+
+# ML models
+ML/models/*.pkl
+ML/*.pkl
+contract-ml-service/*.pkl
+contract-ml-service/app/*.pkl
+*.pkl
