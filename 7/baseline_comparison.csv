@@ -1,0 +1,3 @@
+model,accuracy,f1_macro,f1_micro,hamming_loss
+Logistic Regression,0.6771,0.5247,0.7662,0.0053
+Bi-GRU (PRD),0.7764,0.508,0.8177,0.0043

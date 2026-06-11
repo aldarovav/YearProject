@@ -16,3 +16,15 @@ ML/*.pkl
 contract-ml-service/*.pkl
 contract-ml-service/app/*.pkl
 *.pkl
+# Large model files
+*.keras
+*.pkl
+*.h5
+*.hdf5
+mlartifacts/
+mlruns/
+data_for_error_analysis/
+*/data_for_error_analysis/
+checkpoint6_data.pkl
+bigru_prd.keras
+bigru_tokenizer.pkl

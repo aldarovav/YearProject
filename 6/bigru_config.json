@@ -1,0 +1,12 @@
+{
+  "max_features": 100000,
+  "max_len": 3000,
+  "num_classes": 84,
+  "embedding_dim": 256,
+  "gru_units": [
+    128,
+    64
+  ],
+  "dropout": 0.3,
+  "test_accuracy": 0.7729349384733385
+}
